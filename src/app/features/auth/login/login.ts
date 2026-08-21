@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { RouterLink } from "@angular/router";
+import { Input } from "../../../shared/components/input/input";
 
 @Component({
   selector: 'app-login',
-  imports: [RouterLink],
+  imports: [RouterLink, Input],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
