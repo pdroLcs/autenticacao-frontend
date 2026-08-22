@@ -4,12 +4,14 @@ import { RegisterRequest } from '../../features/auth/models/register-request.mod
 import { Observable } from 'rxjs';
 import { LoginRequest } from '../../features/auth/models/login-request.model';
 import { LoginResponse } from '../../features/auth/models/login-response.model copy';
+import { Token } from './token';
 
 @Injectable({
   providedIn: 'root',
 })
 export class Auth {
   private http = inject(HttpClient);
+  private tokenService = inject(Token);
 
   private readonly apiUrl = 'http://localhost:8080/api/v1/auth';
 
@@ -26,4 +28,6 @@ export class Auth {
       data
     );
   }
+
+  logout = (): void => this.tokenService.clearTokens();
 }
