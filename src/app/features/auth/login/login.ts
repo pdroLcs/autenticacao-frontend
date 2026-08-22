@@ -5,6 +5,7 @@ import { Button } from "../../../shared/components/button/button";
 import { Auth } from '../../../core/services/auth';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Token } from '../../../core/services/token';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +17,7 @@ export class Login {
   private authService = inject(Auth);
   private formBuilder = inject(NonNullableFormBuilder);
   private tokenService = inject(Token);
+  private http = inject(HttpClient);
 
   loginForm = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
@@ -37,6 +39,20 @@ export class Login {
       },
       error: (error) => {
         console.log('Erro ao fazer login', error);
+      }
+    })
+  }
+
+  testProtectedEndpoint = () => {
+    this.http.get('http://localhost:8080/api/v1/test', {
+      responseType: 'text'
+    })
+    .subscribe({
+      next: (response) => {
+        console.log('Resposta:', response);
+      },
+      error: (error) => {
+        console.log('Erro:', error);
       }
     })
   }

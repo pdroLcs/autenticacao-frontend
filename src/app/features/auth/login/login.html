@@ -10,6 +10,8 @@
       <app-input label="Senha:" type="password" name="password" id="password" formControlName="password"/>
 
       <app-button label="Entrar" [ariaDisabled]="loginForm.invalid"/>
+
+      <app-button label="Testar endoint" type="button" (click)="testProtectedEndpoint()"/>
     </form>
 
     <p class="text-center mt-4">
