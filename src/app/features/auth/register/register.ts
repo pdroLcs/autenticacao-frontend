@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Input } from "../../../shared/components/input/input";
 import { Button } from "../../../shared/components/button/button";
 import { RouterLink } from '@angular/router';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Auth } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-register',
@@ -11,10 +12,13 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
   styleUrl: './register.css',
 })
 export class Register {
-  registerForm = new FormGroup({
-    name: new FormControl('', Validators.required),
-    email: new FormControl('', [Validators.required, Validators.email, Validators.maxLength(255)]),
-    password: new FormControl('', [Validators.required, Validators.minLength(4), Validators.maxLength(255)]),
+  private authService = inject(Auth);
+  private formBuilder = inject(NonNullableFormBuilder);
+
+  registerForm = this.formBuilder.group({
+    name: ['', Validators.required],
+    email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
+    password: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(255)]],
   });
 
   register = () => {
@@ -22,7 +26,17 @@ export class Register {
       this.registerForm.markAllAsTouched();
       return;
     }
-    console.log(this.registerForm.value);
+
+    const data = this.registerForm.getRawValue();
+
+    this.authService.register(data).subscribe({
+      next: () => {
+        console.log('Usuário cadastrado!');
+      },
+      error: (error) => {
+        console.log('Erro ao cadastrar usuário', error);
+      }
+    })
   }
 
   get nameError(): string {
