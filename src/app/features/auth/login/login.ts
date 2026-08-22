@@ -3,7 +3,8 @@ import { RouterLink } from "@angular/router";
 import { Input } from "../../../shared/components/input/input";
 import { Button } from "../../../shared/components/button/button";
 import { Auth } from '../../../core/services/auth';
-import { FormBuilder, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Token } from '../../../core/services/token';
 
 @Component({
   selector: 'app-login',
@@ -14,6 +15,7 @@ import { FormBuilder, NonNullableFormBuilder, ReactiveFormsModule, Validators } 
 export class Login {
   private authService = inject(Auth);
   private formBuilder = inject(NonNullableFormBuilder);
+  private tokenService = inject(Token);
 
   loginForm = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
@@ -30,8 +32,8 @@ export class Login {
 
     this.authService.login(data).subscribe({
       next: (response) => {
+        this.tokenService.saveTokens(response.accessToken, response.refreshToken);
         console.log('Login realizado');
-        console.log(response);
       },
       error: (error) => {
         console.log('Erro ao fazer login', error);
