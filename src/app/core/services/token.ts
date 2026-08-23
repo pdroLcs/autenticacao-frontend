@@ -5,21 +5,16 @@ import { Injectable } from '@angular/core';
 })
 export class Token {
 
-  private readonly accessTokenKey = 'access_token';
-  private readonly refreshTokenKey = 'refresh_token';
+  private accessToken: string | null = null;
 
-  saveTokens = (accessToken: string, refreshToken: string): void => {
-    localStorage.setItem(this.accessTokenKey, accessToken);
-    localStorage.setItem(this.refreshTokenKey, refreshToken);
+  saveAccessToken = (accessToken: string): void => {
+    this.accessToken = accessToken;
   }
 
-  getAccessToken = (): string | null => localStorage.getItem(this.accessTokenKey);
+  getAccessToken = (): string | null => this.accessToken;
 
-  getRefreshToken = (): string | null => localStorage.getItem(this.refreshTokenKey);
-
-  clearTokens = (): void => {
-    localStorage.removeItem(this.accessTokenKey);
-    localStorage.removeItem(this.refreshTokenKey);
+  clearAccessToken = (): void => {
+    this.accessToken = null;
   }
 
 }

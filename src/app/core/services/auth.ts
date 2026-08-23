@@ -25,9 +25,22 @@ export class Auth {
   login = (data: LoginRequest): Observable<LoginResponse> => {
     return this.http.post<LoginResponse>(
       `${this.apiUrl}/login`,
-      data
+      data,
+      {
+        withCredentials: true
+      }
     );
   }
 
-  logout = (): void => this.tokenService.clearTokens();
+  refresh = () => {
+    return this.http.post<LoginResponse>(
+      `${this.apiUrl}/refresh`,
+      {},
+      {
+        withCredentials: true
+      }
+    );
+  }
+
+  // logout = (): void => this.tokenService.clearTokens();
 }

@@ -34,7 +34,7 @@ export class Login {
 
     this.authService.login(data).subscribe({
       next: (response) => {
-        this.tokenService.saveTokens(response.accessToken, response.refreshToken);
+        this.tokenService.saveAccessToken(response.accessToken);
         console.log('Login realizado');
       },
       error: (error) => {
