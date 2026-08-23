@@ -1,8 +1,12 @@
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { HttpContextToken, HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Token } from '../services/token';
 import { Auth } from '../services/auth';
-import { catchError, switchMap, throwError } from 'rxjs';
+import { catchError, finalize, Observable, shareReplay, switchMap, throwError } from 'rxjs';
+
+let refreshRequest$: Observable<string> | null = null;
+
+const RETRIED = new HttpContextToken<boolean>(() => false);
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
@@ -27,17 +31,48 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     if (error.status !== 401) {
       return throwError(() => error);
     }
+    if (req.context.get(RETRIED)) {
+      return throwError(() => error);
+    }
 
-    return authService.refresh().pipe(switchMap(() => {
-      const newAccessToken = tokenService.getAccessToken();
+    if (!refreshRequest$) {
+      refreshRequest$ = authService.refresh().pipe(
+        switchMap(response => [response.accessToken]),
+        finalize(() => {
+          refreshRequest$ = null;
+        }),
+        shareReplay(1)
+      );
+    }
 
+    return refreshRequest$.pipe(switchMap(newAccessToken => {
       const retryRequest = req.clone({
         setHeaders: {
           Authorization: `Bearer ${newAccessToken}`
-        }
+        },
+        context: req.context.set(RETRIED, true)
       });
 
       return next(retryRequest);
-    }))
+    }),
+
+    catchError(refreshError => {
+      tokenService.clearAccessToken();
+
+      return throwError(() => refreshError);
+    })
+  );
+
+    // return authService.refresh().pipe(switchMap(() => {
+    //   const newAccessToken = tokenService.getAccessToken();
+
+    //   const retryRequest = req.clone({
+    //     setHeaders: {
+    //       Authorization: `Bearer ${newAccessToken}`
+    //     }
+    //   });
+
+    //   return next(retryRequest);
+    // }))
   }));
 };
