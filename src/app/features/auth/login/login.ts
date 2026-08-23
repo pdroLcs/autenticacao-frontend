@@ -57,6 +57,28 @@ export class Login {
     })
   }
 
+  testRefresh = () => {
+    this.authService.refresh().subscribe({
+      next: response => {
+        console.log("Novo access token:", response.accessToken);
+      },
+      error: error => {
+        console.error("Erro no refresh:", error);
+      }
+    })
+  }
+
+  testLogout = (): void => {
+    this.authService.logout().subscribe({
+      next: () => {
+
+      },
+      error: error => {
+        console.error("Erro ao fazer logout", error);
+      }
+    })
+  }
+
   get emailError(): string {
     const email = this.loginForm.controls.email;
 

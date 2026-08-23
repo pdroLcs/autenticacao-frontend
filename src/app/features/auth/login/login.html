@@ -12,6 +12,10 @@
       <app-button label="Entrar" [ariaDisabled]="loginForm.invalid"/>
 
       <app-button label="Testar endoint" type="button" (click)="testProtectedEndpoint()"/>
+
+      <app-button label="Testar refresh" type="button" (click)="testRefresh()"/>
+
+      <app-button label="Testar logout" type="button" (click)="testLogout()"/>
     </form>
 
     <p class="text-center mt-4">

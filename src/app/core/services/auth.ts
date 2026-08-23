@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { RegisterRequest } from '../../features/auth/models/register-request.model';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { LoginRequest } from '../../features/auth/models/login-request.model';
-import { LoginResponse } from '../../features/auth/models/login-response.model copy';
+import { LoginResponse } from '../../features/auth/models/login-response.model';
 import { Token } from './token';
 
 @Injectable({
@@ -29,7 +29,7 @@ export class Auth {
       {
         withCredentials: true
       }
-    );
+    ).pipe(tap(response => this.tokenService.saveAccessToken(response.accessToken)));
   }
 
   refresh = () => {
@@ -39,8 +39,16 @@ export class Auth {
       {
         withCredentials: true
       }
-    );
+    ).pipe(tap(response => this.tokenService.saveAccessToken(response.accessToken)));
   }
 
-  // logout = (): void => this.tokenService.clearTokens();
+  logout = () => {
+    return this.http.post<void>(
+      `${this.apiUrl}/logout`,
+      {},
+      {
+        withCredentials: true
+      }
+    ).pipe(tap(() => this.tokenService.clearAccessToken()));
+  }
 }
