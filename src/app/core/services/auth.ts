@@ -51,4 +51,8 @@ export class Auth {
       }
     ).pipe(tap(() => this.tokenService.clearAccessToken()));
   }
+
+  clearSession = (): void => {
+    this.tokenService.clearAccessToken();
+  }
 }

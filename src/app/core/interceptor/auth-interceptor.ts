@@ -3,6 +3,7 @@ import { inject } from '@angular/core';
 import { Token } from '../services/token';
 import { Auth } from '../services/auth';
 import { catchError, finalize, Observable, shareReplay, switchMap, throwError } from 'rxjs';
+import { Router } from '@angular/router';
 
 let refreshRequest$: Observable<string> | null = null;
 
@@ -12,6 +13,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   const tokenService = inject(Token);
   const authService = inject(Auth);
+  const router = inject(Router);
 
   if (req.url.includes('/auth/login') || req.url.includes('/auth/register') || req.url.includes('/auth/refresh') || req.url.includes('/auth/logout')) {
     return next(req);
@@ -57,8 +59,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     }),
 
     catchError(refreshError => {
-      tokenService.clearAccessToken();
-
+      authService.clearSession();
+      router.navigate(['/login']);
       return throwError(() => refreshError);
     })
   );
