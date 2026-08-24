@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { RegisterRequest } from '../../features/auth/models/register-request.model';
-import { Observable, tap } from 'rxjs';
+import { catchError, map, Observable, of, tap } from 'rxjs';
 import { LoginRequest } from '../../features/auth/models/login-request.model';
 import { LoginResponse } from '../../features/auth/models/login-response.model';
 import { Token } from './token';
@@ -50,6 +50,19 @@ export class Auth {
         withCredentials: true
       }
     ).pipe(tap(() => this.tokenService.clearAccessToken()));
+  }
+
+  restoreSession = (): Observable<boolean> => {
+    return this.refresh().pipe(
+      map(() => {
+        console.log("Sessão restaurada");
+        return true
+      }),
+      catchError(() => {
+        console.log("Não existe sessão para restaurar");
+        return of(false)
+  })
+    );
   }
 
   clearSession = (): void => {
